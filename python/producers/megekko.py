@@ -47,18 +47,22 @@ def scrape(gpuname):
     for x in list:
         if x["prodname"].lower().find(gpuname.lower()) != -1:
             inStock = x["voorraad"] > 0 if True else False
-            product = Product(x["prodname"], x["price"], "EUR", inStock)
+            product = Product(x["prodname"], x["price"], "EUR", inStock, x["prodnum"], f"https://www.megekko.nl{x['link']}", x["resultno"])
             products.append(product)
 
     return products
 
 
 class Product:
-    def __init__(self, name, price, currency, inStock):
+    def __init__(self, name, price, currency, inStock, productNr, url, rank):
         self.name = name
         self.price = price
         self.currency = currency
         self.inStock = inStock
+        self.productNr = productNr
+        self.url = url
+        self.rank = rank
+
 
     def to_dict(self):
         return {
@@ -66,4 +70,7 @@ class Product:
             "price": self.price,
             "currency": self.currency,
             "inStock": self.inStock,
+            "productNr": self.productNr,
+            "url": self.url,
+            "rank": self.rank
         }
