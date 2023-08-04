@@ -50,7 +50,7 @@ def scrape(gpuname):
             product = Product(x["prodname"], x["price"], "EUR", inStock)
             products.append(product)
 
-    return json.dumps(products, default=lambda o: o.__dict__, indent=4)
+    return products
 
 
 class Product:
@@ -59,3 +59,11 @@ class Product:
         self.price = price
         self.currency = currency
         self.inStock = inStock
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "price": self.price,
+            "currency": self.currency,
+            "inStock": self.inStock,
+        }
