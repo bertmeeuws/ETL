@@ -52,6 +52,18 @@ def scrape(gpuname):
 
     return products
 
+def sendToKafka(producer, products):
+    for el in products:
+        byte_array = json.dumps(el.to_dict()).encode('utf-8')
+
+    future = producer.send("megekko", byte_array)
+
+    try:
+        # Wait for the result and check if the message was sent successfully
+        record_metadata = future.get(timeout=10)
+        print(f"Message sent successfully to topic {record_metadata.topic} partition {record_metadata.partition} offset {record_metadata.offset}")
+    except KafkaError as e:
+        print(f"Failed to send message: {e}")
 
 class Product:
     def __init__(self, name, price, currency, inStock, productNr, url, rank):

@@ -1,0 +1,39 @@
+import requests
+from bs4 import BeautifulSoup
+
+def scrape(gpuname):
+    encodedName = gpuname.replace(" ","+")
+    page = requests.request("GET", f"https://www.alternate.be/listing.xhtml?q={encodedName}&page=1")
+    soup = BeautifulSoup(page.text, 'html.parser')
+    products = []
+
+    for i in soup.findAll("a",{"class":"card align-content-center productBox boxCounter text-font"}):
+        name = i.find("div",{"class":"product-name font-weight-bold"}).text
+        link = i.get("href")
+        price = i.find("div",{"class":"col-auto order-2 pl-0"}).text
+        inStock = i.find("div",{"class":"col-auto delivery-info text-right"}).text
+        productNr = link.rsplit('/', 1)[-1]
+
+        newProduct = AlternateProduct(name,price,link,inStock,productNr)
+        products.append(newProduct)
+
+    return products
+    
+class AlternateProduct:
+    def __init__(self, name, price, link, inStock, productNr):
+        self.name = name
+        self.price = price
+        self.link = link
+        self.inStock = inStock
+        self.productNr = productNr
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "price": self.price,
+            "link": self.link,
+            "inStock": self.inStock,
+            "productNr": self.productNr
+        }
+        
+    
