@@ -14,18 +14,31 @@ def scrape(gpuname):
         inStock = i.find("div",{"class":"col-auto delivery-info text-right"}).text
         productNr = link.rsplit('/', 1)[-1]
 
-        newProduct = AlternateProduct(name,price,link,inStock,productNr)
+        detail = requests.request("GET", link)
+        soup = BeautifulSoup(detail.text, 'html.parser')
+
+        table_element = soup.find("table")
+
+        # Find the second <td> element within the <tr> (the one containing "4719072744526")
+        type = table_element.select('td')[1].text
+        ean = table_element.select('td')[3].text
+
+        if type != "Grafische kaart":
+            continue
+
+        newProduct = AlternateProduct(name,price,link,inStock,productNr, ean)
         products.append(newProduct)
 
     return products
     
 class AlternateProduct:
-    def __init__(self, name, price, link, inStock, productNr):
+    def __init__(self, name, price, link, inStock, productNr, EAN):
         self.name = name
         self.price = price
         self.link = link
         self.inStock = inStock
         self.productNr = productNr
+        self.EAN = EAN
 
     def to_dict(self):
         return {
@@ -33,7 +46,8 @@ class AlternateProduct:
             "price": self.price,
             "link": self.link,
             "inStock": self.inStock,
-            "productNr": self.productNr
+            "productNr": self.productNr,
+            "EAN": self.EAN
         }
         
     

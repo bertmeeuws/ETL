@@ -1,5 +1,7 @@
 import requests
 import json
+from bs4 import BeautifulSoup
+
 
 
 def scrape(gpuname):
@@ -45,10 +47,27 @@ def scrape(gpuname):
     products = []
 
     for x in list:
-        if x["prodname"].lower().find(gpuname.lower()) != -1:
             inStock = x["voorraad"] > 0 if True else False
-            product = Product(x["prodname"], x["price"], "EUR", inStock, x["prodnum"], f"https://www.megekko.nl{x['link']}", x["resultno"])
+            name = x["prodname"]
+            price = x["price"]
+            link = f"https://www.megekko.nl{x['link']}"
+
+            detail = requests.request("GET", link)
+            soup = BeautifulSoup(detail.text, 'html.parser')
+
+            ean_label_div = soup.find('div', class_='t1', text='EAN')
+            
+            if ean_label_div == None:
+                continue
+            
+            # Get the EAN code from the corresponding div with class "t2"
+            ean_code_div = ean_label_div.find_next('div', class_='t2')
+            ean_code = ean_code_div.text
+
+
+            product = Product(name, price, "EUR", inStock, x["prodnum"], link, x["resultno"], ean_code)
             products.append(product)
+
 
     return products
 
@@ -66,7 +85,7 @@ def sendToKafka(producer, products):
         print(f"Failed to send message: {e}")
 
 class Product:
-    def __init__(self, name, price, currency, inStock, productNr, url, rank):
+    def __init__(self, name, price, currency, inStock, productNr, url, rank, EAN):
         self.name = name
         self.price = price
         self.currency = currency
@@ -74,6 +93,7 @@ class Product:
         self.productNr = productNr
         self.url = url
         self.rank = rank
+        self.EAN = EAN
 
 
     def to_dict(self):
@@ -84,5 +104,6 @@ class Product:
             "inStock": self.inStock,
             "productNr": self.productNr,
             "url": self.url,
-            "rank": self.rank
+            "rank": self.rank,
+            "EAN": self.EAN
         }
