@@ -1,0 +1,67 @@
+# Python-specific
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.pyc
+*.swp
+*.coverage
+
+# Python virtual environment
+venv/
+env/
+env_bak/
+.vscode/
+
+# Compiled bytecode
+*.pyc
+*.pyo
+*.pyd
+
+# Cache and logs
+logs/
+*.log
+
+# Dependencies
+lib/
+lib64/
+dist/
+build/
+bin/
+eggs/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Editor-specific
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Airflow-specific
+airflow.cfg
+*.pyc
+*.log
+*.out
+*.err
+*.pid
+*.sqlite
+*.state
+*.tar.gz
+*.zip
+*.egg-info/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+db/
+webserver_config.py
+.env
