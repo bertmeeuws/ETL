@@ -2,6 +2,7 @@ from kafka import KafkaConsumer
 import pandas as pd
 import time
 import json
+import airflow
 
 consumer = KafkaConsumer(
     "products",
