@@ -1,8 +1,9 @@
-import requests
-from bs4 import BeautifulSoup
+
 
 
 def scrape(gpuname):
+    import requests
+    from bs4 import BeautifulSoup
     encodedName = gpuname.replace(" ","+")
     page = requests.request("GET", f"https://www.alternate.be/listing.xhtml?q={encodedName}&page=1")
     soup = BeautifulSoup(page.text, 'html.parser')

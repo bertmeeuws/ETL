@@ -1,10 +1,8 @@
-import requests
-import json
-from bs4 import BeautifulSoup
-import airflow
-
-
 def scrape(gpuname):
+    import requests
+    import json
+    from bs4 import BeautifulSoup
+
     url = "https://www.megekko.nl/pages/zoeken/v4/v4.php"
 
     encodedUri = gpuname.replace(" ", "+")
@@ -71,7 +69,12 @@ def scrape(gpuname):
 
     return products
 
-def sendToKafka(producer, products):
+def sendToKafka(**context):
+    ti = context['ti']
+    producer = ti.xcom_pull(task_ids='create_kafka_producer_task')
+    products = ti.xcom_pull(task_ids='scrape_megekko_task')
+
+    import json
     for el in products:
         byte_array = json.dumps(el.to_dict()).encode('utf-8')
 
